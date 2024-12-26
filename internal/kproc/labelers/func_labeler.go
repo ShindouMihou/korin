@@ -1,6 +1,6 @@
 package labelers
 
-import "korin/pkg/klabels"
+import "github.com/ShindouMihou/korin/pkg/klabels"
 
 func FuncLine(line string) klabels.Label {
 	label := klabels.Label{Kind: klabels.FunctionKind}

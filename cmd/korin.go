@@ -1,6 +1,6 @@
 package main
 
-import "korin/pkg/kbuild"
+import "github.com/ShindouMihou/korin/pkg/kbuild"
 
 func main() {
 	korin := kbuild.NewKorin()
