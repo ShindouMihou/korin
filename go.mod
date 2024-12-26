@@ -1,4 +1,4 @@
-module korin
+module github.com/ShindouMihou/korin
 
 go 1.21
 
