@@ -1,9 +1,9 @@
 package kproc
 
 import (
-	"korin/internal/kproc/labelers"
-	"korin/internal/kstrings"
-	"korin/pkg/klabels"
+	"github.com/ShindouMihou/korin/internal/kproc/labelers"
+	"github.com/ShindouMihou/korin/internal/kstrings"
+	"github.com/ShindouMihou/korin/pkg/klabels"
 	"strings"
 )
 

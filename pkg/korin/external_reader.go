@@ -1,8 +1,8 @@
 package korin
 
 import (
-	"korin/internal/kstrings"
-	"korin/pkg/klabels"
+	"github.com/ShindouMihou/korin/internal/kstrings"
+	"github.com/ShindouMihou/korin/pkg/klabels"
 	"strings"
 )
 

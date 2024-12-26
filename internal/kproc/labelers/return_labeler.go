@@ -1,7 +1,7 @@
 package labelers
 
 import (
-	"korin/pkg/klabels"
+	"github.com/ShindouMihou/korin/pkg/klabels"
 	"strings"
 )
 

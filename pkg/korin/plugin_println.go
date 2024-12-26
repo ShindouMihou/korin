@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ShindouMihou/go-little-utils/slices"
-	"korin/pkg/klabels"
+	"github.com/ShindouMihou/korin/pkg/klabels"
 	"strconv"
 	"strings"
 )
