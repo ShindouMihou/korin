@@ -1,87 +1,96 @@
 # Korin
 
-An experimental, created for learning and fun, Golang preprocessor. Korin is a preprocessor that is embedded with the 
-codebase enabling Golang codebases to minimize code duplication on some parts with the use of preprocessing before 
-compilation.
+Korin is an experimental Golang preprocessor designed for learning and fun. It empowers developers to minimize code duplication by enabling preprocessing before compilation. By embedding directly into your codebase, Korin enhances code maintainability with its extensible plugin architecture.
 
-Korin works by reading each Golang line-by-line, processing and gaining an understanding of each line to allow "plugins" 
-to read the lines and decide whether to preprocess the line to add changes, such as adding new lines after, or 
-modifying the line entirely.
+## How Korin Works
 
-As an example, one of the default plugins is `k:float` which propogates errors back up to the function, for example:
+Korin processes your Golang code line-by-line, allowing plugins to analyze, modify, or extend the code dynamically. Each plugin can:
+- Add new lines
+- Modify existing lines
+- Transform specific code patterns
+
+### Example: `k:float` Plugin
+The `k:float` plugin automates error propagation:
 ```go
 stats, _ := json.Marshal(statistics)            // +k:float
 ```
-
-The above line will be transformed into:
+Becomes:
 ```go
 stats, err := json.Marshal(statistics)
 if err != nil {
-	return 
+    return
 }
 ```
+This transformation ensures proper error handling, returning the zero value based on the function's result type (e.g., `0` for `int`, `""` for `string`). The source code for this plugin can be found in [`plugin_error_propagation.go`](pkg/korin/plugin_error_propagation.go).
 
-It returns based on what the function's result type's zero-value is, for example, a function with a result type of 
-`int` will return `0` while a function with a result type of `string` will return `""`.
-
-You can find the source code of the error propagation plugin under [`plugin_error_propogation.go`](pkg/korin/plugin_error_propgation.go).
-
-Another interesting plugin is the `k:named` which will produce annotations for field declaration using the name of the field, for example, 
-the following:
+### Example: `k:named` Plugin
+The `k:named` plugin generates field annotations based on field names. For instance:
 ```go
 type Test struct {
-	NameCharacters string // +k:named(json,yaml,bson)
+    NameCharacters string // +k:named(json,yaml,bson)
 }
 ```
-
-The above will be transformed into:
+Transforms to:
 ```go
 type Test struct {
-	NameCharacters string `json:"name_characters" yaml:"name_characters" bson:"name_characters"`
+    NameCharacters string `json:"name_characters" yaml:"name_characters" bson:"name_characters"`
 }
 ```
+You can customize the case format:
+- **Camel Case:**
+  ```go
+  type Test struct {
+      NameCharacters string // +k:named(camelCase,json,yaml,bson)
+  }
+  ```
+- **Snake Case:** Default behavior.
+- **Original Name:**
+  ```go
+  type Test struct {
+      NameCharacters string // +k:named(original,json,yaml,bson)
+  }
+  ```
 
-You can also specify whether to use camel case or snake case by adding the `snake_case` or `camelCase` argument to the plugin, **it should be the 
-first argument**. For example:
-```go
-type Test struct {
-    NameCharacters string // +k:named(camelCase,json,yaml,bson)
-}
-````
+## Supported Syntaxes
+Korin supports preprocessing for:
+- **Type declarations**
+- **Field declarations**
+- **Variable declarations**
+- **Function declarations** (including anonymous functions)
+- **Import declarations**
+- **Package declarations**
+- **Return statements**
+- **Comment declarations**
 
-Additionally, you can also specify it to keep the original name by adding the `original` argument to the plugin, **it should be the first argument**.
-For example:
-```go
-type Test struct {
-    NameCharacters string // +k:named(original,json,yaml,bson)
-}
-```
+## Upcoming Features
+- **Const declarations**: Planned for future releases.
+- **Var declarations**: Coming soon.
 
 ## Usage
 
-Korin is designed in a way that it takes over the entrypoint to proxy to the actual entrypoint which will run the application, such that, 
-you will run `go run cmd/korin.go` instead of your usual `go run cmd/app.go`. To begin, create a file under your `cmd` folder called `korin.go` and 
-copy the lines:
+Korin intercepts the entry point to preprocess your codebase. To use Korin, create a `cmd/korin.go` file and add the following:
 ```go
 package main
 
-import "korin/pkg/kbuild"
+import "github.com/ShindouMihou/korin/pkg/kbuild"
 
 func main() {
-	korin := kbuild.NewKorin()
-	
-	// If you'd like to silent the logger, uncomment the line below (this doesn't affect when error logs when preprocessing)
-	// korin.Logger = kbuild.NoOpLogger
-	
-	korin.Run("cmd/app.go")  // Replace this value with your entry point if it isn't cmd/app.go
+    korin := kbuild.NewKorin()
+
+    // Uncomment to silence the logger (error logs during preprocessing remain unaffected)
+    // korin.Logger = kbuild.NoOpLogger
+
+    korin.Run("cmd/app.go")  // Replace with your actual entry point
 }
 ```
+Korin scans the codebase (excluding files listed in `.korignore`), preprocesses required files, and outputs them to the configured build directory (default: `.build`).
 
-Korin will scan through the entire codebase, respecting the `.korignore` file, to analyze and check for any files that needs preprocessing, 
-and will preprocess any found. All processed files will be under the configured build directory (`.build`, by default). Generally, a codebase of roughly 
-2,000-4,000 lines should take under 5-10 milliseconds to preprocess, but this also depends on some factors, but generally, it should be fast.
+### Performance
+Korin processes a 2,000-4,000 line codebase in under 5-10 milliseconds on average, though performance may vary depending on project complexity.
 
 ## License
 
-Korin is licensed under the MIT license. you are free to redistribute, use and do other related actions under the MIT license. 
-this is permanent and irrevocable.
+Korin is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute this project in compliance with the license terms.
+
+---
+Elevate your Golang projects with Korin's seamless preprocessing capabilities!
