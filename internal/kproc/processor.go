@@ -24,7 +24,7 @@ func LabelLine(index int, line string) klabels.Analysis {
 	} else if kstrings.HasPrefix(line, "const") {
 
 	} else if kstrings.HasPrefix(line, "type") {
-
+		labels = append(labels, labelers.TypeDeclaration(line))
 	} else if kstrings.HasPrefix(line, "var") {
 
 	} else if kstrings.HasPrefix(line, "package ") {

@@ -30,9 +30,8 @@ type VariableDeclaration struct {
 }
 
 type TypeDeclaration struct {
-	Name       string         `json:"name"`
-	Kind       string         `json:"kind"`
-	Properties []TypeProperty `json:"properties"`
+	Name string `json:"name"`
+	Kind string `json:"kind"`
 }
 
 type TypeProperty struct {
@@ -59,14 +58,15 @@ type LabelKind string
 type TypeKind int
 
 const (
-	FunctionKind        LabelKind = "Function"
-	VariableKind                  = "Variable"
-	ConstantKind                  = "Constant"
-	TypeDeclarationKind           = "Type"
-	UnknownKind                   = "Unknown"
-	CommentKind                   = "Comment"
-	PackageKind                   = "Package"
-	ReturnKind                    = "ReturnStatement"
-	ScopeBeginKind                = "ScopeBegin"
-	ScopeEndKind                  = "ScopeEnd"
+	FunctionKind         LabelKind = "Function"
+	VariableKind                   = "Variable"
+	ConstantKind                   = "Constant"
+	TypeDeclarationKind            = "Type"
+	FieldDeclarationKind           = "Field"
+	UnknownKind                    = "Unknown"
+	CommentKind                    = "Comment"
+	PackageKind                    = "Package"
+	ReturnKind                     = "ReturnStatement"
+	ScopeBeginKind                 = "ScopeBegin"
+	ScopeEndKind                   = "ScopeEnd"
 )
