@@ -69,6 +69,10 @@ import "korin/pkg/kbuild"
 
 func main() {
 	korin := kbuild.NewKorin()
+	
+	// If you'd like to silent the logger, uncomment the line below (this doesn't affect when error logs when preprocessing)
+	// korin.Logger = kbuild.NoOpLogger
+	
 	korin.Run("cmd/app.go")  // Replace this value with your entry point if it isn't cmd/app.go
 }
 ```

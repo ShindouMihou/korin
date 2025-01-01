@@ -13,10 +13,16 @@ import (
 	"path/filepath"
 )
 
+var (
+	NoOpLogger Logger = func(args ...any) {}
+)
+
+type Logger func(args ...any)
 type Korin struct {
 	BuildDirectory string
 	Plugins        []korin.Plugin
 	BuildCommand   string
+	Logger         Logger
 }
 
 func (ko Korin) Process(dir string) []error {
@@ -24,10 +30,11 @@ func (ko Korin) Process(dir string) []error {
 		BuildDirectory: ko.BuildDirectory,
 		Plugins:        ko.Plugins,
 		BuildCommand:   ko.BuildCommand,
+		Logger:         ko.Logger,
 	}, dir)
 }
 
-func handle(errs []error) bool {
+func (ko Korin) handle(errs []error) bool {
 	if len(errs) > 0 {
 		fmt.Println()
 		fmt.Println(
@@ -59,19 +66,19 @@ func handle(errs []error) bool {
 
 func (ko Korin) Build(dir string) {
 	errs := ko.Process(".")
-	if !handle(errs) {
+	if !ko.handle(errs) {
 		return
 	}
 }
 
 func (ko Korin) Run(path string) {
 	errs := ko.Process(".")
-	if !handle(errs) {
+	if !ko.handle(errs) {
 		return
 	}
 
-	fmt.Println()
-	fmt.Println(
+	ko.Logger()
+	ko.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Green).
@@ -79,7 +86,7 @@ func (ko Korin) Run(path string) {
 			Style("running:"),
 		path,
 	)
-	fmt.Println(
+	ko.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Yellow).
@@ -87,7 +94,7 @@ func (ko Korin) Run(path string) {
 			Style("-----------------------------"),
 		path,
 	)
-	fmt.Println()
+	ko.Logger()
 
 	var stdoutBuf, stderrBuf, stdinBuf bytes.Buffer
 	cmd := exec.Command("go", "run", filepath.Join(".build/", path))
@@ -118,5 +125,8 @@ func NewKorin() *Korin {
 			korin.PluginSerializerAnnotations{},
 		},
 		BuildCommand: "go build {$BUILD_FOLDER}/{$FILE_NAME}.go",
+		Logger: func(args ...any) {
+			fmt.Println(args...)
+		},
 	}
 }

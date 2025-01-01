@@ -25,18 +25,19 @@ type Configuration struct {
 	BuildDirectory string
 	Plugins        []korin.Plugin
 	BuildCommand   string
+	Logger         func(args ...any)
 }
 
 func logSettings(config *Configuration) {
 	screen.Clear()
-	fmt.Println(
+	config.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Magenta).
 			WithBackground(chalk.ResetColor).
 			Style("korin where it matters"),
 	)
-	fmt.Println(
+	config.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithTextStyle(chalk.Italic).
@@ -44,8 +45,8 @@ func logSettings(config *Configuration) {
 			WithBackground(chalk.ResetColor).
 			Style("the simple unnecessary golang preprocessor"),
 	)
-	fmt.Println()
-	fmt.Println(
+	config.Logger()
+	config.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Yellow).
@@ -53,7 +54,7 @@ func logSettings(config *Configuration) {
 			Style("build dir:"),
 		config.BuildDirectory,
 	)
-	fmt.Println(
+	config.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Yellow).
@@ -61,7 +62,7 @@ func logSettings(config *Configuration) {
 			Style("build command:"),
 		config.BuildCommand,
 	)
-	fmt.Println(
+	config.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Yellow).
@@ -71,7 +72,7 @@ func logSettings(config *Configuration) {
 			return fmt.Sprintf("%s.%s:%s", v.Group(), v.Name(), v.Version())
 		})),
 	)
-	fmt.Println()
+	config.Logger()
 }
 
 func readIgnoreFile(file string) []string {
@@ -151,7 +152,7 @@ func Process(config *Configuration, dir string) []error {
 		}
 
 		if ignorePatterns != nil && ignorePatterns.MatchesPath(file.Path()) {
-			fmt.Println(
+			config.Logger(
 				chalk.Bold.
 					NewStyle().
 					WithForeground(chalk.Red).
@@ -198,7 +199,7 @@ func Process(config *Configuration, dir string) []error {
 				)
 				return
 			}
-			fmt.Println(
+			config.Logger(
 				chalk.Bold.
 					NewStyle().
 					WithForeground(chalk.Green).
@@ -212,8 +213,8 @@ func Process(config *Configuration, dir string) []error {
 	}
 
 	wg.Wait()
-	fmt.Println()
-	fmt.Println(
+	config.Logger()
+	config.Logger(
 		chalk.Bold.
 			NewStyle().
 			WithForeground(chalk.Yellow).
