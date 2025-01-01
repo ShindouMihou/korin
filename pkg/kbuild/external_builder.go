@@ -25,6 +25,9 @@ type Korin struct {
 	Logger         Logger
 }
 
+// Process processes the directory specified in the `dir` parameter.
+// Unlike `Build`, this function returns the `errors` that occurred during the processing, and won't
+// print them out.
 func (ko Korin) Process(dir string) []error {
 	return kcomp.Process(&kcomp.Configuration{
 		BuildDirectory: ko.BuildDirectory,
@@ -64,13 +67,32 @@ func (ko Korin) handle(errs []error) bool {
 	return true
 }
 
+// Build builds the directory specified in the `dir` parameter.
+// Unlike process, this will actually handle the errors and prints them out.
 func (ko Korin) Build(dir string) {
-	errs := ko.Process(".")
+	errs := ko.Process(dir)
 	if !ko.handle(errs) {
 		return
 	}
 }
 
+// BuildRootDirectory builds the root directory (which is "." directory of the project)
+func (ko Korin) BuildRootDirectory() {
+	ko.Build(".")
+}
+
+// BuildWorkingDirectory builds the current working directory of the project, based on `os.Getwd()`
+func (ko Korin) BuildWorkingDirectory() {
+	currentWorkingDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	ko.Build(currentWorkingDir)
+}
+
+// Run builds the root directory, and then runs the specified path, it will be automatically
+// be proxied to the build directory, so the path, such as "cmd/main.go" will be automatically proxied to
+// ".build/cmd/main.go" instead.
 func (ko Korin) Run(path string) {
 	errs := ko.Process(".")
 	if !ko.handle(errs) {
@@ -107,6 +129,7 @@ func (ko Korin) Run(path string) {
 	}
 }
 
+// Plugin adds a plugin to the list of plugins that will be used during the processing of the files.
 func (ko Korin) Plugin(plugin korin.Plugin) {
 	if slices.Filter(ko.Plugins, func(b korin.Plugin) bool {
 		return b.Name() == plugin.Name() && b.Group() == b.Group()
@@ -116,6 +139,7 @@ func (ko Korin) Plugin(plugin korin.Plugin) {
 	ko.Plugins = append(ko.Plugins, plugin)
 }
 
+// NewKorin creates a new instance of Korin with the default values.
 func NewKorin() *Korin {
 	return &Korin{
 		BuildDirectory: ".build/",
