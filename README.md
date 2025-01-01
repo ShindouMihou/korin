@@ -26,6 +26,37 @@ It returns based on what the function's result type's zero-value is, for example
 
 You can find the source code of the error propagation plugin under [`plugin_error_propogation.go`](pkg/korin/plugin_error_propgation.go).
 
+Another interesting plugin is the `k:named` which will produce annotations for field declaration using the name of the field, for example, 
+the following:
+```go
+type Test struct {
+	NameCharacters string // +k:named(json,yaml,bson)
+}
+```
+
+The above will be transformed into:
+```go
+type Test struct {
+	NameCharacters string `json:"name_characters" yaml:"name_characters" bson:"name_characters"`
+}
+```
+
+You can also specify whether to use camel case or snake case by adding the `snake_case` or `camelCase` argument to the plugin, **it should be the 
+first argument**. For example:
+```go
+type Test struct {
+    NameCharacters string // +k:named(camelCase,json,yaml,bson)
+}
+````
+
+Additionally, you can also specify it to keep the original name by adding the `original` argument to the plugin, **it should be the first argument**.
+For example:
+```go
+type Test struct {
+    NameCharacters string // +k:named(original,json,yaml,bson)
+}
+```
+
 ## Usage
 
 Korin is designed in a way that it takes over the entrypoint to proxy to the actual entrypoint which will run the application, such that, 

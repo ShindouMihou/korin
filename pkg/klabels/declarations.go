@@ -34,10 +34,10 @@ type TypeDeclaration struct {
 	Kind string `json:"kind"`
 }
 
-type TypeProperty struct {
-	Name       string `json:"name"`
-	Type       string `json:"type"`
-	Annotation string `json:"annotation"`
+type FieldDeclaration struct {
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Annotations string `json:"annotation"`
 }
 
 type ConstantDeclaration struct {

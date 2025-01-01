@@ -7,7 +7,7 @@ import (
 
 func main() {
 	type Statistics struct {
-		RunningMemory int `json:"runningMemory"`
+		RunningMemory int // +k:named(camelCase,json)
 	}
 	statistics := Statistics{RunningMemory: 24_000} // +k:println
 	stats, _ := json.Marshal(statistics)            // +k:float

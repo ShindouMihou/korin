@@ -32,6 +32,17 @@ func (assistant Reader) Parameters(prefix string, labels []klabels.Label) (bool,
 	return false, parameters
 }
 
+func (assistant Reader) Annotations(prefix string, annotations string) []string {
+	var foundAnnotations []string
+	for _, annotation := range strings.Split(annotations, " ") {
+		if kstrings.HasPrefix(annotation, prefix+":\"") {
+			currentAnnotations := strings.Split(annotation[len(prefix)+2:len(annotation)-1], ",")
+			foundAnnotations = append(foundAnnotations, currentAnnotations...)
+		}
+	}
+	return foundAnnotations
+}
+
 func (assistant Reader) Get(kind klabels.LabelKind, labels []klabels.Label) *klabels.Label {
 	for _, label := range labels {
 		label := label

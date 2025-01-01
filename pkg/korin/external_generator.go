@@ -152,3 +152,15 @@ func (generator Generator) Import(packages []string) string {
 		return text
 	}
 }
+
+func (generator Generator) TypeDeclaration(name string, kind string) string {
+	return "type " + name + " " + kind
+}
+
+func (generator Generator) FieldDeclaration(name string, kind string, annotation string) string {
+	text := name + " " + kind
+	if annotation != "" {
+		text += " `" + annotation + "`"
+	}
+	return text
+}

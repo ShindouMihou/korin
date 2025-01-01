@@ -7,7 +7,7 @@ import (
 
 func main() {
 	type Statistics struct {
-		RunningMemory int `json:"runningMemory"`
+		RunningMemory int `json:"running_memory"`
 	}
 	statistics := Statistics{RunningMemory: 24_000}
 	fmt.Println("statistics: ", statistics)

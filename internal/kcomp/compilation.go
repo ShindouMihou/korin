@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ShindouMihou/go-little-utils/slices"
 	"github.com/ShindouMihou/korin/internal/kproc"
+	"github.com/ShindouMihou/korin/internal/kproc/labelers"
 	"github.com/ShindouMihou/korin/internal/kstrings"
 	"github.com/ShindouMihou/korin/pkg/klabels"
 	"github.com/ShindouMihou/korin/pkg/korin"
@@ -253,8 +254,21 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 	var contents korin.Writer
 
 	isInImportScope := false
+	isInTypeDeclaration := false
 	if err := reader.EachLine(func(line string) {
 		labels := kproc.LabelLine(index, line)
+		if isInTypeDeclaration {
+			if line == "}" {
+				isInTypeDeclaration = false
+			} else {
+				labels.Labels = append(labels.Labels, labelers.FieldDeclaration(line))
+			}
+		}
+
+		if len(labels.Labels) > 0 && korin.ReadAssistant.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
+			isInTypeDeclaration = true
+		}
+
 		stack = append(stack, labels)
 		defer func() {
 			index++

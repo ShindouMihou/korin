@@ -21,10 +21,9 @@ func (headers *Headers) Package(name string) {
 func (headers *Headers) Format() string {
 	text := "package " + headers.pkg
 	text += "\n"
-	text += "\n"
 	if len(headers.imports) > 0 {
-		text += WriteAssistant.Import(headers.imports)
 		text += "\n"
+		text += WriteAssistant.Import(headers.imports)
 	}
 	return text
 }
