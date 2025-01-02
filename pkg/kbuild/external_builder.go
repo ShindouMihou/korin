@@ -147,6 +147,7 @@ func NewKorin() *Korin {
 			korin.ErrorPropogationPlugin{},
 			korin.PrintLinePlugin{},
 			korin.PluginSerializerAnnotations{},
+			korin.PluginEnvironmentKey{},
 		},
 		BuildCommand: "go build {$BUILD_FOLDER}/{$FILE_NAME}.go",
 		Logger: func(args ...any) {

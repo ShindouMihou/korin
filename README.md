@@ -50,6 +50,39 @@ You can customize the case format:
       NameCharacters string // +k:named(original,json,yaml,bson)
   }
   ```
+  
+### Example: `k:env` Plugin
+
+The `k:env` plugin automatically sets the value of a variable to its corresponding environment value. For instance:
+```go
+var Port = "{$ENV:PORT}" // +k:env
+```
+
+Transforms to:
+```go
+var Port = "8080"
+````
+
+You can also specify a type, and Korin will try to automatically convert it to that value on the fly. For instance:
+```go
+const Port = "{$ENV:PORT}" // +k:env(int)
+```
+
+When using the types `bool`, any `int`, any `float`, or `rune`, Korin will automatically drop the value of the environment variable 
+as is, for instance, with the above code, it becomes:
+```go
+const Port int = 8080
+```
+
+Otherwise, if it's a `string` or an unknown type, such as a typealias, or a custom type, Korin will automatically convert the value to a string, for instance:
+```go
+const Port = "{$ENV:PORT}" // +k:env(PortType)
+```
+
+Transforms to:
+```go
+const Port PortType = "8080"
+```
 
 ## Supported Syntaxes
 Korin supports preprocessing for:

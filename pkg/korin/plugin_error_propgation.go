@@ -127,7 +127,7 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 		tab := WriteAssistant.TabSizeFrom(line)
 
 		line := tab
-		line += WriteAssistant.VariableDeclaration(errorVar.Reassignment, declarationNames, declarationValues)
+		line += WriteAssistant.VariableDeclaration(errorVar.Reassignment, declarationNames, declarationValues, "")
 		line += WriteAssistant.NewLine()
 		line += tab + WriteAssistant.If(errorVariableName+" != nil") + " " + WriteAssistant.OpenBracket()
 		line += WriteAssistant.NewLine()

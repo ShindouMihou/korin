@@ -72,8 +72,12 @@ func (generator Generator) NewLine() string {
 	return "\n"
 }
 
-func (generator Generator) VariableDeclaration(reassign bool, names []string, values []string) string {
+func (generator Generator) VariableDeclaration(reassign bool, names []string, values []string, kind string) string {
 	text := generator.CommaSeparate(names)
+
+	if kind != "" {
+		text += " " + kind
+	}
 
 	if reassign {
 		text += " = "
