@@ -22,11 +22,21 @@ func LabelLine(index int, line string) klabels.Analysis {
 	if kstrings.HasPrefix(line, "func") {
 		labels = append(labels, labelers.FuncLine(line))
 	} else if kstrings.HasPrefix(line, "const") {
-
+		if !kstrings.HasSuffix(line, "(") {
+			labels = append(labels, klabels.Label{Kind: klabels.ConstDeclarationKind})
+			labels = append(labels, labelers.VariableAssignment(false, line[6:]))
+		} else {
+			labels = append(labels, klabels.Label{Kind: klabels.ConstScopeBeginKind})
+		}
 	} else if kstrings.HasPrefix(line, "type") {
 		labels = append(labels, labelers.TypeDeclaration(line))
 	} else if kstrings.HasPrefix(line, "var") {
-
+		if !kstrings.HasSuffix(line, "(") {
+			labels = append(labels, klabels.Label{Kind: klabels.VarDeclarationKind})
+			labels = append(labels, labelers.VariableAssignment(false, line[4:]))
+		} else {
+			labels = append(labels, klabels.Label{Kind: klabels.VarScopeBeginKind})
+		}
 	} else if kstrings.HasPrefix(line, "package ") {
 		labels = append(labels, labelers.Package(line))
 	} else if kstrings.HasPrefix(line, "return ") {

@@ -61,10 +61,8 @@ Korin supports preprocessing for:
 - **Package declarations**
 - **Return statements**
 - **Comment declarations**
-
-## Upcoming Features
-- **Const declarations**: Planned for future releases.
-- **Var declarations**: Coming soon.
+- **Const declarations** (including multiple constants)
+- **Var declarations** (including multiple variables)
 
 ## Usage
 

@@ -255,19 +255,46 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 	var contents korin.Writer
 
 	isInImportScope := false
+
 	isInTypeDeclaration := false
+	isInConstScope, isInVarScope := false, false
+
 	if err := reader.EachLine(func(line string) {
 		labels := kproc.LabelLine(index, line)
 		if isInTypeDeclaration {
 			if line == "}" {
 				isInTypeDeclaration = false
+				labels.Labels = append(labels.Labels, klabels.Label{Kind: klabels.ScopeEndKind})
 			} else {
 				labels.Labels = append(labels.Labels, labelers.FieldDeclaration(line))
 			}
 		}
 
-		if len(labels.Labels) > 0 && korin.ReadAssistant.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
-			isInTypeDeclaration = true
+		if isInConstScope || isInVarScope {
+			if line == ")" {
+				kind := klabels.VarScopeEndKind
+				if isInConstScope {
+					kind = klabels.ConstScopeEndKind
+				}
+				labels.Labels = append(labels.Labels, klabels.Label{Kind: klabels.LabelKind(kind)})
+				isInConstScope, isInVarScope = false, false
+			} else {
+				kind := klabels.VarDeclarationKind
+				if isInConstScope {
+					kind = klabels.ConstDeclarationKind
+				}
+				labels.Labels = append(labels.Labels, klabels.Label{Kind: klabels.LabelKind(kind)})
+			}
+		}
+
+		if len(labels.Labels) > 0 {
+			if korin.ReadAssistant.Get(klabels.ConstScopeBeginKind, labels.Labels) != nil {
+				isInConstScope = true
+			} else if korin.ReadAssistant.Get(klabels.VarScopeBeginKind, labels.Labels) != nil {
+				isInVarScope = true
+			} else if korin.ReadAssistant.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
+				isInTypeDeclaration = true
+			}
 		}
 
 		stack = append(stack, labels)
