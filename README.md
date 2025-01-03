@@ -103,14 +103,14 @@ Korin intercepts the entry point to preprocess your codebase. To use Korin, crea
 ```go
 package main
 
-import "github.com/ShindouMihou/korin/pkg/kbuild"
+import "github.com/ShindouMihou/korin/pkg/korin"
 
 func main() {
-    korin := kbuild.NewKorin()
+    korin := korin.New()
 
     // Uncomment to silence the logger (error logs during preprocessing remain unaffected)
     // korin.Logger = kbuild.NoOpLogger
-
+	
     korin.Run("cmd/app.go")  // Replace with your actual entry point
 }
 ```

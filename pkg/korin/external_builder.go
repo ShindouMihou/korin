@@ -1,11 +1,11 @@
-package kbuild
+package korin
 
 import (
 	"bytes"
 	"fmt"
 	"github.com/ShindouMihou/go-little-utils/slices"
 	"github.com/ShindouMihou/korin/internal/kcomp"
-	"github.com/ShindouMihou/korin/pkg/korin"
+	"github.com/ShindouMihou/korin/pkg/kplugins"
 	"github.com/ttacon/chalk"
 	"io"
 	"os"
@@ -20,7 +20,7 @@ var (
 type Logger func(args ...any)
 type Korin struct {
 	BuildDirectory string
-	Plugins        []korin.Plugin
+	Plugins        []kplugins.Plugin
 	BuildCommand   string
 	Logger         Logger
 }
@@ -130,8 +130,8 @@ func (ko Korin) Run(path string) {
 }
 
 // Plugin adds a plugin to the list of plugins that will be used during the processing of the files.
-func (ko Korin) Plugin(plugin korin.Plugin) {
-	if slices.Filter(ko.Plugins, func(b korin.Plugin) bool {
+func (ko Korin) Plugin(plugin kplugins.Plugin) {
+	if slices.Filter(ko.Plugins, func(b kplugins.Plugin) bool {
 		return b.Name() == plugin.Name() && b.Group() == b.Group()
 	}) != nil {
 		return
@@ -139,15 +139,15 @@ func (ko Korin) Plugin(plugin korin.Plugin) {
 	ko.Plugins = append(ko.Plugins, plugin)
 }
 
-// NewKorin creates a new instance of Korin with the default values.
-func NewKorin() *Korin {
+// New creates a new instance of Korin with the default values.
+func New() *Korin {
 	return &Korin{
 		BuildDirectory: ".build/",
-		Plugins: []korin.Plugin{
-			korin.ErrorPropogationPlugin{},
-			korin.PrintLinePlugin{},
-			korin.PluginSerializerAnnotations{},
-			korin.PluginEnvironmentKey{},
+		Plugins: []kplugins.Plugin{
+			kplugins.ErrorPropogationPlugin{},
+			kplugins.PrintLinePlugin{},
+			kplugins.PluginSerializerAnnotations{},
+			kplugins.PluginEnvironmentKey{},
 		},
 		BuildCommand: "go build {$BUILD_FOLDER}/{$FILE_NAME}.go",
 		Logger: func(args ...any) {

@@ -8,7 +8,7 @@ import (
 	"github.com/ShindouMihou/korin/internal/kproc/labelers"
 	"github.com/ShindouMihou/korin/internal/kstrings"
 	"github.com/ShindouMihou/korin/pkg/klabels"
-	"github.com/ShindouMihou/korin/pkg/korin"
+	"github.com/ShindouMihou/korin/pkg/kplugins"
 	"github.com/ShindouMihou/siopao/siopao"
 	"github.com/inancgumus/screen"
 	ignore "github.com/sabhiram/go-gitignore"
@@ -23,7 +23,7 @@ import (
 
 type Configuration struct {
 	BuildDirectory string
-	Plugins        []korin.Plugin
+	Plugins        []kplugins.Plugin
 	BuildCommand   string
 	Logger         func(args ...any)
 }
@@ -68,7 +68,7 @@ func logSettings(config *Configuration) {
 			WithForeground(chalk.Yellow).
 			WithBackground(chalk.ResetColor).
 			Style("plugins:"),
-		korin.SyntaxHelper.CommaSeparate(slices.Map(config.Plugins, func(v korin.Plugin) string {
+		kplugins.SyntaxHelper.CommaSeparate(slices.Map(config.Plugins, func(v kplugins.Plugin) string {
 			return fmt.Sprintf("%s.%s:%s", v.Group(), v.Name(), v.Version())
 		})),
 	)
@@ -251,8 +251,8 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 	index := 0
 	var stack []klabels.Analysis
 
-	var headers korin.Headers
-	var contents korin.Writer
+	var headers kplugins.Headers
+	var contents kplugins.Writer
 
 	isInImportScope := false
 
@@ -288,11 +288,11 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 		}
 
 		if len(labels.Labels) > 0 {
-			if korin.ReadHelper.Get(klabels.ConstScopeBeginKind, labels.Labels) != nil {
+			if kplugins.ReadHelper.Get(klabels.ConstScopeBeginKind, labels.Labels) != nil {
 				isInConstScope = true
-			} else if korin.ReadHelper.Get(klabels.VarScopeBeginKind, labels.Labels) != nil {
+			} else if kplugins.ReadHelper.Get(klabels.VarScopeBeginKind, labels.Labels) != nil {
 				isInVarScope = true
-			} else if korin.ReadHelper.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
+			} else if kplugins.ReadHelper.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
 				isInTypeDeclaration = true
 			}
 		}

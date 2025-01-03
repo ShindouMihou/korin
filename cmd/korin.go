@@ -1,8 +1,8 @@
 package main
 
-import "github.com/ShindouMihou/korin/pkg/kbuild"
+import "github.com/ShindouMihou/korin/pkg/korin"
 
 func main() {
-	korin := kbuild.NewKorin()
+	korin := korin.New()
 	korin.Run("examples/sample.go")
 }

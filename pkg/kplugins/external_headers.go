@@ -1,4 +1,4 @@
-package korin
+package kplugins
 
 import (
 	"github.com/ShindouMihou/korin/internal/kslices"

@@ -1,4 +1,4 @@
-package korin
+package kplugins
 
 import "strings"
 
