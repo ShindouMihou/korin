@@ -116,6 +116,11 @@ func main() {
 ```
 Korin scans the codebase (excluding files listed in `.korignore`), preprocesses required files, and outputs them to the configured build directory (default: `.build`).
 
+### Plugins
+To create a plugin, you can read about it in the [Creating a Plugin](docs/creating_a_plugin.md) documentation, otherwise, 
+you can check out the [native plugins](pkg/kplugins) that are already available, these should have the `plugin_` prefix on their filenames, by 
+default, all these plugins are automatically included when you create a new `korin` instance.
+
 ### Performance
 Korin processes a 2,000-4,000 line codebase in under 5-10 milliseconds on average, though performance may vary depending on project complexity.
 
