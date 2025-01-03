@@ -68,7 +68,7 @@ func logSettings(config *Configuration) {
 			WithForeground(chalk.Yellow).
 			WithBackground(chalk.ResetColor).
 			Style("plugins:"),
-		korin.WriteAssistant.CommaSeparate(slices.Map(config.Plugins, func(v korin.Plugin) string {
+		korin.SyntaxHelper.CommaSeparate(slices.Map(config.Plugins, func(v korin.Plugin) string {
 			return fmt.Sprintf("%s.%s:%s", v.Group(), v.Name(), v.Version())
 		})),
 	)
@@ -288,11 +288,11 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 		}
 
 		if len(labels.Labels) > 0 {
-			if korin.ReadAssistant.Get(klabels.ConstScopeBeginKind, labels.Labels) != nil {
+			if korin.ReadHelper.Get(klabels.ConstScopeBeginKind, labels.Labels) != nil {
 				isInConstScope = true
-			} else if korin.ReadAssistant.Get(klabels.VarScopeBeginKind, labels.Labels) != nil {
+			} else if korin.ReadHelper.Get(klabels.VarScopeBeginKind, labels.Labels) != nil {
 				isInVarScope = true
-			} else if korin.ReadAssistant.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
+			} else if korin.ReadHelper.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
 				isInTypeDeclaration = true
 			}
 		}

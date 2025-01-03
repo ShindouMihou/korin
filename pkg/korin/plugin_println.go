@@ -28,8 +28,8 @@ func (p PrintLinePlugin) Version() string {
 func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack []klabels.Analysis) (string, error) {
 	analysis := stack[index]
 
-	varDeclaration := ReadAssistant.Get(klabels.VariableKind, analysis.Labels)
-	shouldPrint, parameters := ReadAssistant.Parameters("+k:println", analysis.Labels)
+	varDeclaration := ReadHelper.Get(klabels.VariableKind, analysis.Labels)
+	shouldPrint, parameters := ReadHelper.Parameters("+k:println", analysis.Labels)
 
 	if shouldPrint {
 		if varDeclaration == nil {
@@ -60,15 +60,15 @@ func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack
 			})
 		}
 
-		tab := WriteAssistant.TabSizeFrom(line)
+		tab := SyntaxHelper.TabSizeFrom(line)
 
 		headers.Import("fmt")
-		comment := ReadAssistant.Get(klabels.CommentKind, analysis.Labels)
+		comment := ReadHelper.Get(klabels.CommentKind, analysis.Labels)
 		line := strings.TrimSuffix(line, "// "+comment.Data.(string))
 		for _, variable := range printVariables {
-			line += WriteAssistant.NewLine()
-			line += tab + WriteAssistant.Call("fmt", "Println", []string{
-				WriteAssistant.Quote(variable.Name+": ") + ", " + variable.Name,
+			line += SyntaxHelper.NewLine()
+			line += tab + SyntaxHelper.Call("fmt", "Println", []string{
+				SyntaxHelper.Quote(variable.Name+": ") + ", " + variable.Name,
 			})
 		}
 		line += ""

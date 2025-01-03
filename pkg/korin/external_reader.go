@@ -6,11 +6,12 @@ import (
 	"strings"
 )
 
-type Reader int
+type ReadHelperType int
 
-var ReadAssistant Reader = 0
+var ReadHelper ReadHelperType = 0
 
-func (assistant Reader) Parameters(prefix string, labels []klabels.Label) (bool, []string) {
+// Parameters is a helper function that gets the parameters based on the prefix and returns them to the caller.
+func (assistant ReadHelperType) Parameters(prefix string, labels []klabels.Label) (bool, []string) {
 	var parameters []string
 	label := assistant.Get(klabels.CommentKind, labels)
 	if label == nil {
@@ -32,7 +33,8 @@ func (assistant Reader) Parameters(prefix string, labels []klabels.Label) (bool,
 	return false, parameters
 }
 
-func (assistant Reader) Annotations(prefix string, annotations string) []string {
+// Annotations is a helper function that gets the annotations based on the prefix and returns them to the caller.
+func (assistant ReadHelperType) Annotations(prefix string, annotations string) []string {
 	var foundAnnotations []string
 	for _, annotation := range strings.Split(annotations, " ") {
 		if kstrings.HasPrefix(annotation, prefix+":\"") {
@@ -43,7 +45,8 @@ func (assistant Reader) Annotations(prefix string, annotations string) []string 
 	return foundAnnotations
 }
 
-func (assistant Reader) Get(kind klabels.LabelKind, labels []klabels.Label) *klabels.Label {
+// Get is a helper function that gets the label based on the kind and returns it to the caller.
+func (assistant ReadHelperType) Get(kind klabels.LabelKind, labels []klabels.Label) *klabels.Label {
 	for _, label := range labels {
 		label := label
 		if label.Kind == kind {
@@ -52,4 +55,37 @@ func (assistant Reader) Get(kind klabels.LabelKind, labels []klabels.Label) *kla
 	}
 
 	return nil
+}
+
+// Filter is a helper function that filters the labels based on the kinds and returns the result to the caller.
+func (assistant ReadHelperType) Filter(labels []klabels.Label, on func(label klabels.Label), kinds ...klabels.LabelKind) {
+	for _, kind := range kinds {
+		for _, label := range labels {
+			label := label
+			if label.Kind == kind {
+				on(label)
+			}
+		}
+	}
+}
+
+// PluginResultFunc is a function that returns a string and an error.
+type PluginResultFunc[T any] func(res T) (string, error)
+
+// Require is a helper function that requires a specific label kind and returns the result to the caller.
+func (assistant ReadHelperType) Require(kind klabels.LabelKind, labels []klabels.Label, on PluginResultFunc[klabels.Label]) (string, error) {
+	label := assistant.Get(kind, labels)
+	if label != nil {
+		return on(*label)
+	}
+	return "", nil
+}
+
+// GetParameters is a helper function that gets the parameters from the labels and returns them to the caller.
+func (assistant ReadHelperType) GetParameters(prefix string, labels []klabels.Label, on PluginResultFunc[[]string]) (string, error) {
+	shouldAnnotate, parameters := assistant.Parameters(prefix, labels)
+	if shouldAnnotate {
+		return on(parameters)
+	}
+	return "", nil
 }

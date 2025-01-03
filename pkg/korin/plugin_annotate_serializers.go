@@ -24,12 +24,12 @@ func (p PluginSerializerAnnotations) Version() string {
 
 func (p PluginSerializerAnnotations) Process(line string, index int, headers *Headers, stack []klabels.Analysis) (string, error) {
 	analysis := stack[index]
-	fieldDeclaration := ReadAssistant.Get(klabels.FieldDeclarationKind, analysis.Labels)
+	fieldDeclaration := ReadHelper.Get(klabels.FieldDeclarationKind, analysis.Labels)
 
 	if fieldDeclaration != nil {
 		field := (*fieldDeclaration).Data.(klabels.FieldDeclaration)
 
-		shouldAnnotate, parameters := ReadAssistant.Parameters("+k:named", analysis.Labels)
+		shouldAnnotate, parameters := ReadHelper.Parameters("+k:named", analysis.Labels)
 		if shouldAnnotate {
 			if len(parameters) <= 0 {
 				return "", errors.New("no parameters found for +k:named, expected at least one serializer (e.g. json)")
@@ -69,8 +69,8 @@ func (p PluginSerializerAnnotations) Process(line string, index int, headers *He
 				field.Annotations += serializer + `:"` + name + `"`
 			}
 
-			line = WriteAssistant.TabSizeFrom(line)
-			line += WriteAssistant.FieldDeclaration(field.Name, field.Type, field.Annotations)
+			line = SyntaxHelper.TabSizeFrom(line)
+			line += SyntaxHelper.FieldDeclaration(field.Name, field.Type, field.Annotations)
 			return line, nil
 		}
 	}

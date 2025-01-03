@@ -27,8 +27,8 @@ func (p ErrorPropogationPlugin) Version() string {
 func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers, stack []klabels.Analysis) (string, error) {
 	analysis := stack[index]
 
-	varDeclaration := ReadAssistant.Get(klabels.VariableKind, analysis.Labels)
-	shouldPropogate, parameters := ReadAssistant.Parameters("+k:float", analysis.Labels)
+	varDeclaration := ReadHelper.Get(klabels.VariableKind, analysis.Labels)
+	shouldPropogate, parameters := ReadHelper.Parameters("+k:float", analysis.Labels)
 
 	if shouldPropogate {
 		if varDeclaration == nil {
@@ -68,7 +68,7 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 
 		var function *klabels.Label
 		for index := analysis.Line; function == nil && index > 0; index-- {
-			fn := ReadAssistant.Get(klabels.FunctionKind, stack[index].Labels)
+			fn := ReadHelper.Get(klabels.FunctionKind, stack[index].Labels)
 			if fn != nil {
 				function = fn
 				break
@@ -124,16 +124,16 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 			}
 		}
 
-		tab := WriteAssistant.TabSizeFrom(line)
+		tab := SyntaxHelper.TabSizeFrom(line)
 
 		line := tab
-		line += WriteAssistant.VariableDeclaration(errorVar.Reassignment, declarationNames, declarationValues, "")
-		line += WriteAssistant.NewLine()
-		line += tab + WriteAssistant.If(errorVariableName+" != nil") + " " + WriteAssistant.OpenBracket()
-		line += WriteAssistant.NewLine()
-		line += tab + WriteAssistant.Tab() + WriteAssistant.Return(resultValues)
-		line += WriteAssistant.NewLine()
-		line += tab + WriteAssistant.CloseBracket()
+		line += SyntaxHelper.VariableDeclaration(errorVar.Reassignment, declarationNames, declarationValues, "")
+		line += SyntaxHelper.NewLine()
+		line += tab + SyntaxHelper.If(errorVariableName+" != nil") + " " + SyntaxHelper.OpenBracket()
+		line += SyntaxHelper.NewLine()
+		line += tab + SyntaxHelper.Tab() + SyntaxHelper.Return(resultValues)
+		line += SyntaxHelper.NewLine()
+		line += tab + SyntaxHelper.CloseBracket()
 		return line, nil
 	}
 
