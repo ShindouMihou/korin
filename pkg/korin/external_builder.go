@@ -76,6 +76,16 @@ func (ko Korin) Build(dir string) {
 	}
 }
 
+// DockerBuildStep is a synonymous function to `Build` but is specifically for Docker builds,
+// as this will exit the program with `os.Exit(1)` which will signify to Docker that the
+// build step failed.
+func (ko Korin) DockerBuildStep(dir string) {
+	errs := ko.Process(dir)
+	if !ko.handle(errs) {
+		os.Exit(1)
+	}
+}
+
 // BuildRootDirectory builds the root directory (which is "." directory of the project)
 func (ko Korin) BuildRootDirectory() {
 	ko.Build(".")
