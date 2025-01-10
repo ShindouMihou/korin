@@ -123,6 +123,14 @@ func main() {
 
     // Uncomment to silence the logger (error logs during preprocessing remain unaffected)
     // korin.Logger = kbuild.NoOpLogger
+
+	// Specify the module name, this will skip reading the `go.mod` to find the module name, which can 
+	// make preprocessing somewhat faster (not significantly since we only read one line). 
+	// k.ModuleName = "github.com/ShindouMihou/korin"
+	
+	// Specifying the location of your go.mod, not providing a ModuleName, and also not providing the correct 
+	// path to your go.mod will result in an error since it cannot find the Module Name. 
+	// k.ModulePath = "./go.mod" 
 	
     korin.Run("cmd/app.go")  // Replace with your actual entry point
 }
