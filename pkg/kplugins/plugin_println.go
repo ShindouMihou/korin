@@ -13,6 +13,10 @@ type PrintLinePlugin struct {
 	Plugin
 }
 
+func NewPrintLinePlugin() PrintLinePlugin {
+	return PrintLinePlugin{}
+}
+
 func (p PrintLinePlugin) Name() string {
 	return "KorinPrintLinePlugin"
 }
@@ -25,7 +29,14 @@ func (p PrintLinePlugin) Version() string {
 	return "1.0.0"
 }
 
-func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack []klabels.Analysis) (string, error) {
+func (p PrintLinePlugin) Context(file string) *any {
+	return nil
+}
+
+func (p PrintLinePlugin) FreeContext(file string) {
+}
+
+func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack []klabels.Analysis, context *any) (string, error) {
 	analysis := stack[index]
 
 	varDeclaration := ReadHelper.Get(klabels.VariableKind, analysis.Labels)
@@ -33,7 +44,7 @@ func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack
 
 	if shouldPrint {
 		if varDeclaration == nil {
-			return "", fmt.Errorf("cannot print non-variable declaration (Line %d)", analysis.Line+1)
+			return NoChanges, fmt.Errorf("cannot print non-variable declaration (Line %d)", analysis.Line+1)
 		}
 
 		variables := (*varDeclaration).Data.([]klabels.VariableDeclaration)
@@ -43,14 +54,14 @@ func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack
 			for index, parameter := range parameters {
 				pos, err := strconv.Atoi(parameter)
 				if err != nil {
-					return "", errors.Join(
+					return NoChanges, errors.Join(
 						fmt.Errorf("expected `int` from k:println param %d (position of print variable) "+
 							"(Line %d)", index, analysis.Line+1),
 						err,
 					)
 				}
 				if len(variables) < pos {
-					return "", fmt.Errorf("no variable in the position of %d in k:println (Line %d)", pos, analysis.Line+1)
+					return NoChanges, fmt.Errorf("no variable in the position of %d in k:println (Line %d)", pos, analysis.Line+1)
 				}
 				printVariables = append(printVariables, variables[pos])
 			}
@@ -75,5 +86,5 @@ func (p PrintLinePlugin) Process(line string, index int, headers *Headers, stack
 		return line, nil
 	}
 
-	return "", nil
+	return NoChanges, nil
 }

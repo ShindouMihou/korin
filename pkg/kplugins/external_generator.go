@@ -199,8 +199,15 @@ func (generator SyntaxHelperType) Import(packages []string) string {
 
 // TypeDeclaration generates a type declaration with the given name and kind, this doesn't include the
 // opening and closing brackets.
-func (generator SyntaxHelperType) TypeDeclaration(name string, kind string) string {
-	return "type " + name + " " + kind
+func (generator SyntaxHelperType) TypeDeclaration(name string, kind string, hasOpenBracket bool, hasClosingBracket bool) string {
+	suffix := ""
+	if hasOpenBracket {
+		suffix += " {"
+		if hasClosingBracket {
+			suffix += "}"
+		}
+	}
+	return "type " + name + " " + kind + suffix
 }
 
 // FieldDeclaration generates a field declaration with the given name, kind and annotation.

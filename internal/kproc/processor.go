@@ -30,6 +30,14 @@ func LabelLine(index int, line string) klabels.Analysis {
 		}
 	} else if kstrings.HasPrefix(line, "type") {
 		labels = append(labels, labelers.TypeDeclaration(line))
+		for _, char := range line {
+			if char == '{' {
+				labels = append(labels, klabels.Label{Kind: klabels.ScopeBeginKind})
+			}
+			if char == '}' {
+				labels = append(labels, klabels.Label{Kind: klabels.ScopeEndKind})
+			}
+		}
 	} else if kstrings.HasPrefix(line, "var") {
 		if !kstrings.HasSuffix(line, "(") {
 			labels = append(labels, klabels.Label{Kind: klabels.VarDeclarationKind})

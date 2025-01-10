@@ -16,7 +16,7 @@ func FieldDeclaration(line string) klabels.Label {
 	currentLocation := "name"
 
 	// Name string `json:"name"`
-	for _, char := range strings.TrimSpace(line) {
+	for i, char := range strings.TrimSpace(line) {
 		if char == ' ' {
 			if currentLocation == "name" && currentToken != "" {
 				name = currentToken
@@ -46,6 +46,16 @@ func FieldDeclaration(line string) klabels.Label {
 			continue
 		}
 		currentToken += string(char)
+
+		if i == len(strings.TrimSpace(line))-1 {
+			if currentLocation == "kind" && currentToken != "" {
+				kind = currentToken
+
+				currentToken = ""
+				currentLocation = "empty"
+				continue
+			}
+		}
 	}
 
 	label.Data = klabels.FieldDeclaration{Name: name, Type: kind, Annotations: annotation}

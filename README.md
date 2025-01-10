@@ -30,10 +30,23 @@ type Test struct {
     NameCharacters string // +k:named(json,yaml,bson)
 }
 ```
+```go
+// +k:named(json,yaml,bson)
+type TestWithMultiline struct {
+    NameCharacters string 
+    Age int
+}
+```
 Transforms to:
 ```go
 type Test struct {
     NameCharacters string `json:"name_characters" yaml:"name_characters" bson:"name_characters"`
+}
+```
+```go
+type TestWithMultiline struct {
+    NameCharacters string `json:"name_characters" yaml:"name_characters" bson:"name_characters"`
+    Age int `json:"age" yaml:"age" bson:"age"`
 }
 ```
 You can customize the case format:

@@ -154,10 +154,10 @@ func New() *Korin {
 	return &Korin{
 		BuildDirectory: ".build/",
 		Plugins: []kplugins.Plugin{
-			kplugins.ErrorPropogationPlugin{},
-			kplugins.PrintLinePlugin{},
-			kplugins.PluginSerializerAnnotations{},
-			kplugins.PluginEnvironmentKey{},
+			kplugins.NewErrorPropogationPlugin(),
+			kplugins.NewPrintLinePlugin(),
+			kplugins.NewPluginSerializerAnnotations(),
+			kplugins.NewPluginEnvironmentKey(),
 		},
 		BuildCommand: "go build {$BUILD_FOLDER}/{$FILE_NAME}.go",
 		Logger: func(args ...any) {

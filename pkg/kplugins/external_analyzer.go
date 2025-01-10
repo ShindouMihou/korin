@@ -6,6 +6,14 @@ type AnalysisHelperType int
 
 var AnalysisHelper AnalysisHelperType = 0
 
+func (a AnalysisHelperType) HasOpenBracket(labels []klabels.Label) bool {
+	return ReadHelper.Get(klabels.ScopeBeginKind, labels) != nil
+}
+
+func (a AnalysisHelperType) HasClosingBracket(labels []klabels.Label) bool {
+	return ReadHelper.Get(klabels.ScopeEndKind, labels) != nil
+}
+
 // CheckMultiLineConstOrVar checks if the current const or var is multi-lined, this does it by checking if the
 // lines before the current line has a ScopeBegin label, and if it has a ScopeEnd label before a ScopeBegin, it will
 // consider it as a non-multi-lined const or var.

@@ -12,6 +12,10 @@ type ErrorPropogationPlugin struct {
 	Plugin
 }
 
+func NewErrorPropogationPlugin() ErrorPropogationPlugin {
+	return ErrorPropogationPlugin{}
+}
+
 func (p ErrorPropogationPlugin) Name() string {
 	return "KorinErrorPropogation"
 }
@@ -24,7 +28,14 @@ func (p ErrorPropogationPlugin) Version() string {
 	return "1.0.0"
 }
 
-func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers, stack []klabels.Analysis) (string, error) {
+func (p ErrorPropogationPlugin) Context(file string) *any {
+	return nil
+}
+
+func (p ErrorPropogationPlugin) FreeContext(file string) {
+}
+
+func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers, stack []klabels.Analysis, context *any) (string, error) {
 	analysis := stack[index]
 
 	varDeclaration := ReadHelper.Get(klabels.VariableKind, analysis.Labels)
@@ -32,7 +43,7 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 
 	if shouldPropogate {
 		if varDeclaration == nil {
-			return "", fmt.Errorf("cannot float error in a non-variable-declaration line (Line %d)", analysis.Line+1)
+			return NoChanges, fmt.Errorf("cannot float error in a non-variable-declaration line (Line %d)", analysis.Line+1)
 		}
 
 		variables := (*varDeclaration).Data.([]klabels.VariableDeclaration)
@@ -41,14 +52,14 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 		if len(parameters) > 0 {
 			pos, err := strconv.Atoi(parameters[0])
 			if err != nil {
-				return "", errors.Join(
+				return NoChanges, errors.Join(
 					fmt.Errorf("expected `int` from k:float's first parameter (position of error variable) "+
 						"(Line %d)", analysis.Line+1),
 					err,
 				)
 			}
 			if len(variables) < pos {
-				return "", fmt.Errorf("no variable in the position of %d in k:float (Line %d)", pos, analysis.Line+1)
+				return NoChanges, fmt.Errorf("no variable in the position of %d in k:float (Line %d)", pos, analysis.Line+1)
 			}
 			errorVar = &variables[pos]
 		} else {
@@ -62,7 +73,7 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 		}
 
 		if errorVar == nil {
-			return "", fmt.Errorf("no error variable provided in k:float (Line %d): "+
+			return NoChanges, fmt.Errorf("no error variable provided in k:float (Line %d): "+
 				"use _ or `err` for the error name, or provide the position as an argument", analysis.Line+1)
 		}
 
@@ -76,7 +87,7 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 		}
 
 		if function == nil {
-			return "", fmt.Errorf("k:float variable is declared in a non-function scope. (Line %d)", analysis.Line+1)
+			return NoChanges, fmt.Errorf("k:float variable is declared in a non-function scope. (Line %d)", analysis.Line+1)
 		}
 
 		results := function.Data.(klabels.FunctionDeclaration).Result
@@ -137,5 +148,5 @@ func (p ErrorPropogationPlugin) Process(line string, index int, headers *Headers
 		return line, nil
 	}
 
-	return "", nil
+	return NoChanges, nil
 }

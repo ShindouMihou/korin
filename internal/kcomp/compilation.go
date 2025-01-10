@@ -292,7 +292,7 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 				isInConstScope = true
 			} else if kplugins.ReadHelper.Get(klabels.VarScopeBeginKind, labels.Labels) != nil {
 				isInVarScope = true
-			} else if kplugins.ReadHelper.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kstrings.HasSuffix(line, "{") {
+			} else if kplugins.ReadHelper.Get(klabels.TypeDeclarationKind, labels.Labels) != nil && kplugins.AnalysisHelper.HasOpenBracket(labels.Labels) {
 				isInTypeDeclaration = true
 			}
 		}
@@ -326,11 +326,16 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 			headers.Package(line[len("package "):])
 			return
 		}
-		hasChanges := false
+		hasChanges, skipLine := false, false
 		for _, plugin := range config.Plugins {
-			result, err := plugin.Process(line, index, &headers, stack)
+			result, err := plugin.Process(line, index, &headers, stack, plugin.Context(file.Path()))
 			if err != nil {
 				panic(err)
+			}
+			if result == kplugins.SkipLine {
+				hasChanges = true
+				skipLine = true
+				break
 			}
 			if result != "" {
 				hasChanges = true
@@ -341,9 +346,16 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 		if !hasChanges {
 			contents.Write(line)
 		}
-		contents.NextLine()
+		if !skipLine {
+			contents.NextLine()
+		}
 	}); err != nil {
 		return "", err
+	}
+
+	// Free all the contexts to save memory as much as possible.
+	for _, plugin := range config.Plugins {
+		plugin.FreeContext(file.Path())
 	}
 	return headers.Format() + contents.Contents(), nil
 }

@@ -11,6 +11,10 @@ type PluginEnvironmentKey struct {
 	Plugin
 }
 
+func NewPluginEnvironmentKey() Plugin {
+	return PluginEnvironmentKey{}
+}
+
 func (p PluginEnvironmentKey) Name() string {
 	return "KorinEnvironmentKey"
 }
@@ -23,7 +27,14 @@ func (p PluginEnvironmentKey) Version() string {
 	return "1.0.0"
 }
 
-func (p PluginEnvironmentKey) Process(line string, index int, headers *Headers, stack []klabels.Analysis) (string, error) {
+func (p PluginEnvironmentKey) Context(file string) *any {
+	return nil
+}
+
+func (p PluginEnvironmentKey) FreeContext(file string) {
+}
+
+func (p PluginEnvironmentKey) Process(line string, index int, headers *Headers, stack []klabels.Analysis, context *any) (string, error) {
 	analysis := stack[index]
 	return ReadHelper.Require(klabels.VariableKind, analysis.Labels, func(label klabels.Label) (string, error) {
 		variables := (label).Data.([]klabels.VariableDeclaration)

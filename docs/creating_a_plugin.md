@@ -150,6 +150,18 @@ func (p MyPlugin) Version() string {
 	return "1.0.0"
 }
 
+// Context is used to keep some information within the same file, this is important for plugins that requires some sort of 
+// multi-line knowledge, such as, plugins that annotates an entire type struct. 
+//
+// A best example of this is found in the `k:named` plugin where it annotates the entire struct with the specified tags.
+func (p MyPlugin) Context(file string) *any {
+	return nil
+}
+
+func (p *MyPlugin) FreeContext(file string) {
+	// Free the context here which is done when the file is finished.
+}
+
 func (p MyPlugin) Process(line string, index int, headers *kplugins.Headers, stack []klabels.Analysis) (string, error) {
     // Your plugin logic here
     return "", nil // Returning "" will keep the line unchanged, recommended to use over returning line itself.

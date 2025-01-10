@@ -10,6 +10,7 @@ require (
 
 require (
 	github.com/inancgumus/screen v0.0.0-20190314163918-06e984b86ed3 // indirect
+	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
