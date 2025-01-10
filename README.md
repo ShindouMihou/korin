@@ -129,6 +129,27 @@ func main() {
 ```
 Korin scans the codebase (excluding files listed in `.korignore`), preprocesses required files, and outputs them to the configured build directory (default: `.build`).
 
+### Using Korin as a Docker Buildstep
+We recommend using Korin as a build step in Dockerfile to ensure that the code is preprocessed before building. To use Korin as a Docker build step, we recommend creating a 
+file  called `cmd/korin_build.go` and adding the following:
+```go
+package main
+
+import "github.com/ShindouMihou/korin/pkg/korin"
+
+func main() {
+    korin := korin.New()
+
+    // Uncomment to silence the logger (error logs during preprocessing remain unaffected)
+    // korin.Logger = kbuild.NoOpLogger
+	
+    korin.DockerBuildStep(".")  // Replace with your path to source files if it isn't "."
+}
+```
+
+Once done, you can add `RUN go run cmd/korin_build.go` as a Docker step and it should preprocess the files beforehand. It is recommended to use this method over `Build` and 
+related since it will exit the program with an exit code when it fails to preprocess a specific file.
+
 ### Plugins
 To create a plugin, you can read about it in the [Creating a Plugin](docs/creating_a_plugin.md) documentation, otherwise, 
 you can check out the [native plugins](pkg/kplugins) that are already available, these should have the `plugin_` prefix on their filenames, by 
