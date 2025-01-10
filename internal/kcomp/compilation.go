@@ -25,6 +25,7 @@ type Configuration struct {
 	BuildDirectory string
 	Plugins        []kplugins.Plugin
 	BuildCommand   string
+	ModuleName     string
 	Logger         func(args ...any)
 }
 
@@ -357,5 +358,5 @@ func process(config *Configuration, file *siopao.File) (string, error) {
 	for _, plugin := range config.Plugins {
 		plugin.FreeContext(file.Path())
 	}
-	return headers.Format() + contents.Contents(), nil
+	return headers.Format(config.ModuleName) + contents.Contents(), nil
 }

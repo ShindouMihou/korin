@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ShindouMihou/go-little-utils/slices"
 	"github.com/ShindouMihou/korin/internal/kcomp"
+	"github.com/ShindouMihou/korin/internal/kmod"
 	"github.com/ShindouMihou/korin/pkg/kplugins"
 	"github.com/ttacon/chalk"
 	"io"
@@ -22,6 +23,8 @@ type Korin struct {
 	BuildDirectory string
 	Plugins        []kplugins.Plugin
 	BuildCommand   string
+	ModuleName     string
+	ModulePath     string
 	Logger         Logger
 }
 
@@ -29,10 +32,26 @@ type Korin struct {
 // Unlike `Build`, this function returns the `errors` that occurred during the processing, and won't
 // print them out.
 func (ko Korin) Process(dir string) []error {
+	moduleName := ko.ModuleName
+	if moduleName == "" {
+		modulePath := ko.ModulePath
+		if modulePath == "" {
+			modulePath = filepath.Join(dir, "go.mod")
+		}
+		module, err := kmod.ReadModule(modulePath)
+		if err != nil {
+			return []error{err}
+		}
+		moduleName = module.Name
+		if moduleName == "" {
+			return []error{fmt.Errorf("module name is empty, please either provide the correct path or module name in the Korin struct")}
+		}
+	}
 	return kcomp.Process(&kcomp.Configuration{
 		BuildDirectory: ko.BuildDirectory,
 		Plugins:        ko.Plugins,
 		BuildCommand:   ko.BuildCommand,
+		ModuleName:     moduleName,
 		Logger:         ko.Logger,
 	}, dir)
 }
@@ -159,6 +178,8 @@ func New() *Korin {
 			kplugins.NewPluginSerializerAnnotations(),
 			kplugins.NewPluginEnvironmentKey(),
 		},
+		ModuleName:   "",
+		ModulePath:   "",
 		BuildCommand: "go build {$BUILD_FOLDER}/{$FILE_NAME}.go",
 		Logger: func(args ...any) {
 			fmt.Println(args...)
